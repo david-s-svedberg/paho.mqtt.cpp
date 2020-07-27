@@ -34,27 +34,6 @@
 	#define MQTTAsync_createOptions_initializer5 { {'M', 'Q', 'C', 'O'}, 0, 0, 100, MQTTVERSION_5 }
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
-// Paho C logger
-
-enum LOG_LEVELS {
-	INVALID_LEVEL = -1,
-	TRACE_MAX = 1,
-	TRACE_MED,
-	TRACE_MIN,
-	TRACE_PROTOCOL,
-	LOG_PROTOCOL = TRACE_PROTOCOL,
-	LOG_ERROR,
-	LOG_SEVERE,
-	LOG_FATAL,
-};
-
-extern "C" {
-	void Log(enum LOG_LEVELS, int, const char *, ...);
-}
-
-/////////////////////////////////////////////////////////////////////////////
-
 namespace mqtt {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -141,17 +120,15 @@ async_client::~async_client()
 // Class static callbacks.
 // These are the callbacks directly from the C-lib. In each case the
 // 'context' should be the address of the async_client object that
-// registered the callback. 
+// registered the callback.
 
 
 // Callback for MQTTAsync_setConnected()
-// This is installed with the normall callbacks and with a call to 
-// reconnect() to indicate that it succeeded. It is called after the token 
-// is notified of success on a normal connect with callbacks. 
+// This is installed with the normall callbacks and with a call to
+// reconnect() to indicate that it succeeded. It is called after the token
+// is notified of success on a normal connect with callbacks.
 void async_client::on_connected(void* context, char* cause)
 {
-	::Log(TRACE_MIN, -1, "[cpp] on_connected");
-
 	if (context) {
 		async_client* cli = static_cast<async_client*>(context);
 		callback* cb = cli->userCallback_;
@@ -168,12 +145,10 @@ void async_client::on_connected(void* context, char* cause)
 }
 
 // Callback for when the connection is lost.
-// This is called from the MQTTAsync_connectionLost registered via 
-// MQTTAsync_setCallbacks(). 
+// This is called from the MQTTAsync_connectionLost registered via
+// MQTTAsync_setCallbacks().
 void async_client::on_connection_lost(void *context, char *cause)
 {
-	::Log(TRACE_MIN, -1, "[cpp] on_connection lost");
-
 	if (context) {
 		async_client* cli = static_cast<async_client*>(context);
 		callback* cb = cli->userCallback_;
@@ -194,8 +169,8 @@ void async_client::on_connection_lost(void *context, char *cause)
 }
 
 // Callback for when a subscribed message arrives.
-// This is called from the MQTTAsync_messageArrived registered via 
-// MQTTAsync_setCallbacks(). 
+// This is called from the MQTTAsync_messageArrived registered via
+// MQTTAsync_setCallbacks().
 int async_client::on_message_arrived(void* context, char* topicName, int topicLen,
 									 MQTTAsync_message* msg)
 {
@@ -376,7 +351,7 @@ void async_client::set_message_callback(message_handler cb)
 // Connect
 
 token_ptr async_client::connect()
-{ 
+{
 	return connect(connect_options());
 }
 
